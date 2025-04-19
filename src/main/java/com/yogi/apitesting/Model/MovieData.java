@@ -18,6 +18,7 @@ public class MovieData {
           this.setPrimarytitle(primarytitle);
           this.setStartyear(startyear);
           this.setUrl(url);
+          this.toPrint();
      }
 
      public String getId() {

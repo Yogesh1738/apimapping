@@ -1,6 +1,8 @@
 package com.yogi.apitesting;
 
 import com.yogi.apitesting.Model.MovieData;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -86,7 +90,7 @@ public class controller {
 
 
 
-
+   //usage of Map<String,Object>  , for simple json object use Map<String,Object> , for lisr of json use List<Map<String,Object>>
     @GetMapping("move")
     public ResponseEntity<List> func3()
     {
@@ -114,5 +118,45 @@ public class controller {
 
         return response;
     }
+
+
+   //usage of jsonobject and jsonarray
+    @GetMapping("newmove")
+    public ResponseEntity<String> func4()
+    {
+        String API_URL = "https://imdb236.p.rapidapi.com/imdb/lowest-rated-movies";
+        String API_KEY = "8c5cdf7b7dmshb0ed6912443df2cp1877d4jsn966277b6762d";  // Replace with your API key
+
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.set("x-rapidapi-key", API_KEY);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.GET, requestEntity, String.class);
+        JSONArray responsearray = new JSONArray(response.getBody());
+        List<MovieData> datalist = new ArrayList<>();
+        for (int i = 0; i < responsearray.length(); i++) {
+            JSONObject obj = responsearray.getJSONObject(i);
+            String id = obj.getString("id");   //String id = project.get("id").toString()  also ok
+            String url = obj.getString("url");
+            String primarytitle = obj.getString("primaryTitle");
+            String originaltitle = obj.getString("originalTitle");
+            Integer styear = obj.getInt("startYear");
+
+//            if there is an  jsonOBject then obj.getJsonObject() ,
+//                    we cam use general method like
+//                    Object newobject = obj.get("url");
+//                    String id = (String) newobject
+//
+            MovieData data = new MovieData(id, url, primarytitle , originaltitle , styear);
+            datalist.add(data);
+        }
+        datalist.forEach(data -> System.out.println("data is " + data.toPrint()));
+
+        return response;
+    }
+
+
+
 
 }
